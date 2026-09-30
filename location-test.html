@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Location Test</title>
+<style>
+  body { font-family: sans-serif; background:#111; color:#eee; padding:20px; font-size:16px; line-height:1.6; }
+  button { font-size:18px; padding:14px 20px; border-radius:10px; border:none; background:#8b7ae6; color:#fff; width:100%; margin-bottom:16px; }
+  #log { white-space: pre-wrap; background:#000; padding:14px; border-radius:10px; font-family:monospace; font-size:13px; min-height:200px; }
+  .ok { color:#7CFC00; } .err { color:#ff6b6b; } .info { color:#7ec8ff; }
+</style>
+</head>
+<body>
+  <h2>📍 Location + Webhook Test</h2>
+  <button onclick="runTest()">Run Test</button>
+  <div id="log">Tap the button to start.</div>
+
+<script>
+const webhookUrl = "https://discord.com/api/webhooks/1553116105885749468/GZ7b_MiPm4hvYiL5zv8GPU8RchwKXP26pqa-YT6zkgWMxnzbwbxk0roMSzd3MxzWqxbp";
+const logEl = document.getElementById('log');
+
+function log(msg, cls) {
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  logEl.appendChild(line);
+}
+
+function runTest() {
+  logEl.innerHTML = '';
+  log('Page origin: ' + location.origin + location.pathname, 'info');
+  log('Protocol: ' + location.protocol, 'info');
+  log('isSecureContext: ' + window.isSecureContext, window.isSecureContext ? 'ok' : 'err');
+
+  if (!window.isSecureContext) {
+    log('❌ NOT a secure context. Geolocation will likely be blocked by the browser entirely. You need https:// or localhost, not file://.', 'err');
+  }
+
+  if (!navigator.geolocation) {
+    log('❌ navigator.geolocation does not exist in this browser/WebView at all.', 'err');
+    return;
+  }
+  log('✅ navigator.geolocation exists. Requesting position...', 'info');
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      log('✅ GOT A FIX: ' + pos.coords.latitude + ', ' + pos.coords.longitude + ' (accuracy ' + Math.round(pos.coords.accuracy) + 'm)', 'ok');
+      sendToWebhook(pos);
+    },
+    (err) => {
+      log('❌ getCurrentPosition FAILED. code=' + err.code + ' message=' + err.message, 'err');
+      log('code 1 = PERMISSION_DENIED, 2 = POSITION_UNAVAILABLE, 3 = TIMEOUT', 'info');
+    },
+    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+  );
+}
+
+function sendToWebhook(pos) {
+  log('Sending to Discord webhook...', 'info');
+  const content = `📍 TEST: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+  fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content })
+  })
+  .then(res => {
+    log('Webhook response status: ' + res.status, res.ok ? 'ok' : 'err');
+    if (res.ok) log('✅ SENT — check your Discord channel now.', 'ok');
+    else log('❌ Discord rejected the request. Check the webhook URL is still valid.', 'err');
+  })
+  .catch(e => {
+    log('❌ fetch() itself threw an error: ' + e.message, 'err');
+    log('This usually means network access is blocked (check the app has Internet permission).', 'info');
+  });
+}
+</script>
+</body>
+</html>
