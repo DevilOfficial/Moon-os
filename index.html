@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MOON OS — for Tasnimun</title>
+<style>
+:root{
+  --ink:#f7f3ff;
+  --muted:#b9b1c9;
+  --glass:rgba(24,18,32,.48);
+  --glass2:rgba(255,255,255,.10);
+  --line:rgba(255,255,255,.14);
+  --accent:#d9c2ff;
+  --pink:#ffb9dd;
+  --cyan:#b8e7ff;
+  --shadow:0 24px 70px rgba(0,0,0,.48);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:#000;color:var(--ink)}
+button,input{font:inherit; outline:none;}
+button{border:0}
+
+#desktop{
+  position:relative;width:100vw;height:100vh;display:block;padding:0;
+}
+.iphone{
+  width:100vw;height:100vh;min-height:100%;
+  border:none;border-radius:0;overflow:hidden;position:relative;
+  background:#111;box-shadow:none;
+}
+.wallpaper{
+  position:absolute;inset:0;background:
+    radial-gradient(circle at 70% 20%,rgba(255,255,255,.14),transparent 9%),
+    radial-gradient(circle at 78% 24%,rgba(208,181,255,.20),transparent 18%),
+    linear-gradient(140deg,#100d17,#21162c 48%,#0d0c14);
+}
+.wallpaper:after{
+  content:"";position:absolute;inset:0;
+  background-image:
+    radial-gradient(circle at 12% 17%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 24% 71%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 42% 22%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 57% 14%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 88% 47%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 68% 79%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 34% 89%,#fff 0 1px,transparent 1.5px);
+  opacity:.42;
+  animation: starTwinkle 3.5s ease-in-out infinite alternate;
+}
+@keyframes starTwinkle {
+  0% { opacity: 0.25; transform: scale(0.98); }
+  100% { opacity: 0.65; transform: scale(1.02); }
+}
+
+.photo-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;display:none;
+}
+.photo-bg.active{display:block}
+.scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.22),rgba(0,0,0,.54));}
+.dynamic-island{
+  position:absolute;top:25px;left:50%;transform:translateX(-50%);width:122px;height:31px;border-radius:20px;background:#050505;z-index:20; cursor:pointer;
+  box-shadow: 0 0 10px rgba(217, 194, 255, 0.15);
+  transition: box-shadow 0.3s, transform 0.2s;
+}
+.dynamic-island:hover {
+  box-shadow: 0 0 16px rgba(255, 185, 221, 0.45);
+}
+.status{position:absolute;top:25px;left:20px;right:20px;display:flex;justify-content:space-between;font-size:13px;font-weight:700;z-index:21}
+.status .right{display:flex;gap:9px}
+.screen{position:absolute;inset:0;z-index:5;padding:70px 18px 20px;display:none; animation: fade 0.3s ease;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.screen.active{display:block}
+.time{
+  text-align:center;font-weight:600;font-size:72px;line-height:1;margin-top:60px;letter-spacing:-4px;text-shadow:0 4px 26px rgba(0,0,0,.4)
+}
+.date{text-align:center;font-weight:600;font-size:16px;margin-top:8px}
+.lock-bottom{position:absolute;left:18px;right:18px;bottom:24px;text-align:center}
+.face{
+  width:68px;height:68px;border-radius:50%;margin:0 auto 14px;
+  background:rgba(255,255,255,.16);backdrop-filter:blur(18px);display:grid;place-items:center;font-size:26px;border:1px solid rgba(255,255,255,.2);
+  animation: moonGlow 3s ease-in-out infinite alternate;
+}
+@keyframes moonGlow {
+  0% { box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+  100% { box-shadow: 0 0 25px rgba(217,194,255,0.5); }
+}
+.password{
+  display:flex;justify-content:center;gap:9px;margin:10px 0 12px;
+}
+.password input{
+  width:155px;text-align:center;letter-spacing:10px;padding:11px 10px;border-radius:15px;background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.18);outline:none;font-size:16px;
+}
+.unlock-note{font-size:12px;color:#ddd; margin-top:8px;}
+.photo-picker{margin-top:10px}
+.photo-picker label{
+  display:inline-flex;gap:6px;align-items:center;padding:9px 12px;border-radius:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);cursor:pointer;font-size:12px;transition:0.2s;
+}
+.photo-picker label:hover{background:rgba(255,255,255,.2);}
+.photo-picker input{display:none}
+
+.home{padding-top:85px}
+.greeting{padding:3px 8px 16px}
+.greeting .small{font-size:13px;color:#ddd}
+.greeting h1{font-size:25px;margin:3px 0 0;letter-spacing:-.5px; display:flex; align-items:center; gap:8px;}
+
+/* PULSING HEART ANIMATION */
+.pulse-heart {
+  display: inline-block;
+  font-size: 18px;
+  animation: heartPulse 1.5s infinite ease-in-out;
+}
+@keyframes heartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); filter: drop-shadow(0 0 6px var(--pink)); }
+}
+
+.app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 12px;padding:8px 2px 130px}
+.app{background:transparent;color:white;cursor:pointer;text-align:center}
+.icon{
+  width:58px;height:58px;border-radius:17px;margin:0 auto 7px;display:grid;place-items:center;font-size:27px;
+  background:linear-gradient(150deg,rgba(255,255,255,.20),rgba(255,255,255,.07));
+  border:1px solid rgba(255,255,255,.10);box-shadow:0 10px 22px rgba(0,0,0,.18);backdrop-filter:blur(18px);
+  transition:.18s transform,.18s filter
+}
+.app:hover .icon{transform:translateY(-3px) scale(1.05);filter:brightness(1.15)}
+.app span{font-size:11px;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+.dock{
+  position:absolute;left:12px;right:12px;bottom:24px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.10);backdrop-filter:blur(28px);padding:12px;border-radius:25px;display:flex;justify-content:space-around;z-index:8
+}
+.dock .icon{width:52px;height:52px;margin:0}
+.home-indicator{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:10px;background:#fff;opacity:.85;z-index:20}
+@keyframes starDrift{
+  0%   { transform: translate(-50%, 0) scale(1); }
+  25%  { transform: translate(calc(-50% + 70px), -14px) scale(1.15); }
+  50%  { transform: translate(-50%, -4px) scale(0.9); }
+  75%  { transform: translate(calc(-50% - 70px), -16px) scale(1.1); }
+  100% { transform: translate(-50%, 0) scale(1); }
+}
+.window{
+  position:absolute;inset:62px 0 0;background:rgb(11,9,16);z-index:30;display:none;padding:18px 16px 30px;overflow-x:hidden;overflow-y:auto; overscroll-behavior:contain; animation:slideUp 0.35s cubic-bezier(0.2,0.8,0.2,1);
+  contain:layout paint style; transform:translateZ(0); isolation:isolate;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.window.active{display:block}
+.win-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;position:sticky;top:0;background:rgb(11,9,16);padding:4px 0 12px;z-index:2}
+.close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.10);color:white;cursor:pointer;font-size:18px;transition:0.2s;}
+.close:hover{background:rgba(255,255,255,.25);}
+.win-head h2{font-size:22px;margin:0}
+
+#messages.window{display:none;flex-direction:column;overflow:hidden;padding-bottom:10px;}
+#messages.window.active{display:flex;}
+#messages .win-head{position:relative;top:auto;flex:0 0 auto;width:100%;margin-bottom:8px;z-index:50;isolation:isolate;}
+#messages .chat-container{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:10px;padding:4px 2px 14px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;isolation:isolate;}
+#messages .message{position:relative;z-index:0;flex:0 0 auto;width:100%;min-width:0;margin:0;padding:14px;background:rgb(28,24,35);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 8px 22px rgba(0,0,0,.18);overflow:hidden;isolation:isolate;contain:paint;backface-visibility:hidden;}
+#messages .message .bubble{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word;}
+#messages .chat-input-bar{flex:0 0 auto;position:relative;bottom:auto;width:100%;margin-top:4px;padding:10px 0 8px;background:rgb(11,9,16);border-top:1px solid rgba(255,255,255,.10);z-index:50;isolation:isolate;}
+#messages .footer-note{flex:0 0 auto;margin:2px 0 0;padding:0 0 2px;}
+.card{
+  background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 10px 25px rgba(0,0,0,.14)
+}
+.mood-btn{
+  background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:16px 14px;
+  color:#fff;font-size:14px;text-align:left;cursor:pointer;transition:transform .15s ease, background .15s ease;
+}
+.mood-btn:hover{background:rgba(255,255,255,.09);transform:translateY(-2px)}
+.mood-btn:active{transform:translateY(0) scale(0.98)}
+.card h3{margin:0 0 7px;font-size:15px}
+.card p{margin:0;color:#ddd;line-height:1.6;font-size:13px}
+.message{display:flex;gap:10px;align-items:flex-start}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#f6c7ff,#9a7cff);display:grid;place-items:center;font-size:18px;flex:none}
+.bubble{background:#7657e8;color:white;border-radius:17px 17px 5px 17px;padding:11px 13px;font-size:13px;line-height:1.45;max-width:85%}
+.bubble.user-bubble{background:#ffb9dd;color:#1a1321;border-radius:17px 17px 17px 5px;margin-left:auto;}
+.open-when button,.days button,.music-item,.memory-btn{
+  width:100%;text-align:left;padding:14px;border-radius:15px;background:rgba(255,255,255,.07);color:white;border:1px solid var(--line);cursor:pointer;margin-bottom:8px; transition:0.2s;
+}
+.open-when button:hover,.days button:hover,.music-item:hover,.memory-btn:hover{background:rgba(255,255,255,.15); transform:translateX(3px);}
+.big-moon{
+  font-size:88px;text-align:center;margin:4px 0 10px;filter:drop-shadow(0 0 28px rgba(220,190,255,.35)); cursor:pointer; transition:0.2s transform;
+  animation: floatMoon 4s ease-in-out infinite alternate;
+}
+@keyframes floatMoon {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+.big-moon:active{transform:scale(0.9);}
+.center{text-align:center}
+.muted{color:#aaa;font-size:12px}
+
+/* CHAT MESSENGER SPECIFIC UI */
+.chat-container { display: flex; flex-direction: column; gap: 10px; padding-bottom: 70px; }
+.chat-input-bar {
+  display: flex; gap: 8px; position: sticky; bottom: 0; background: rgb(11,9,16);
+  padding: 10px 0 10px 0; border-top: 1px solid var(--line); z-index: 5;
+}
+.chat-input-bar input {
+  flex: 1; background: rgba(255,255,255,0.08); border: 1px solid var(--line); border-radius: 14px;
+  padding: 10px 14px; color: white; outline: none; font-size: 14px;
+}
+.chat-input-bar button {
+  background: var(--pink); color: #1a1321; font-weight: 700; padding: 0 16px; border-radius: 14px; cursor: pointer; transition: 0.2s;
+}
+.chat-input-bar button:hover { background: var(--accent); }
+
+/* PIXEL CHIBI (8-BIT STYLE) */
+.chibi-wrap { text-align: center; }
+.pixel-chibi {
+  width: 120px; height: 150px;
+  margin: 15px auto 25px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  animation: pixelBob 1s steps(2, end) infinite;
+  filter: drop-shadow(0 12px 15px rgba(0,0,0,0.3));
+}
+@keyframes pixelBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+.pixel-chibi.pat-anim {
+  animation: pixelPat 0.4s steps(4, end);
+}
+@keyframes pixelPat {
+  0% { transform: scale(1) translateY(0); }
+  25% { transform: scale(1.15, 0.8) translateY(12px); }
+  50% { transform: scale(0.9, 1.1) translateY(-8px); }
+  75% { transform: scale(1.05, 0.95) translateY(2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* Skin & Head */
+.p-head {
+  position: absolute; top: 15px; left: 20px;
+  width: 80px; height: 75px;
+  background: #d4a373;
+  border: 4px solid #1a1a1a;
+  z-index: 5;
+}
+
+/* Middle Part Hair */
+.p-hair { position: absolute; background: #222; border: 4px solid #1a1a1a; }
+.p-hair.top-l { top:-12px; left:-4px; width: 42px; height: 24px; border-bottom: none; border-right: none; }
+.p-hair.top-r { top:-12px; right:-4px; width: 42px; height: 24px; border-bottom: none; border-left: none; }
+.p-part { position: absolute; top:-12px; left:38px; width:4px; height:12px; background:#d4a373; border-bottom:4px solid #1a1a1a; z-index: 6; }
+.p-hair.bang-l { top:8px; left:-8px; width:16px; height:32px; border-top: none; border-right: none; }
+.p-hair.bang-r { top:8px; right:-8px; width:16px; height:32px; border-top: none; border-left: none; }
+
+/* Glasses & Eyes */
+.p-glasses { position: absolute; top: 22px; left: -8px; width: 88px; height: 28px; z-index: 6; }
+.p-glass { position: absolute; top: 0; width: 36px; height: 26px; border: 4px solid #1a1a1a; background: rgba(255,255,255,0.15); }
+.p-glass.l { left: 4px; }
+.p-glass.r { right: 4px; }
+.p-bridge { position: absolute; top: 10px; left: 40px; width: 8px; height: 4px; background: #1a1a1a; }
+
+.p-eye { position: absolute; top: 32px; width: 6px; height: 6px; background: #111; z-index: 7; }
+.p-eye.l { left: 16px; }
+.p-eye.r { right: 16px; }
+
+/* Clean-shaven face */
+.p-mouth { position: absolute; top: 56px; left: 36px; width: 8px; height: 4px; background: #8c3b3b; z-index: 7; }
+
+/* Textured Suit Body */
+.p-body {
+  position: absolute; top: 86px; left: 28px;
+  width: 64px; height: 50px;
+  background: repeating-linear-gradient(45deg, #2b2b36, #2b2b36 4px, #202028 4px, #202028 8px);
+  border: 4px solid #1a1a1a;
+  border-bottom: none;
+  z-index: 4;
+  overflow: hidden;
+}
+.p-shirt {
+  position: absolute; top: 0; left: 18px; width: 20px; height: 22px;
+  background: #f4f4f4;
+  border-left: 4px solid #1a1a1a; border-right: 4px solid #1a1a1a; border-bottom: 4px solid #1a1a1a;
+}
+.p-tie {
+  position: absolute; top: 12px; left: 22px; width: 12px; height: 35px;
+  background: #8c2a2a;
+  border: 4px solid #1a1a1a; border-top: none;
+}
+
+/* Textured Suit Arms */
+.p-arm {
+  position: absolute; top: 90px;
+  width: 20px; height: 40px;
+  background: repeating-linear-gradient(45deg, #2b2b36, #2b2b36 4px, #202028 4px, #202028 8px);
+  border: 4px solid #1a1a1a;
+  z-index: 3;
+}
+.p-arm.l { left: 14px; }
+.p-arm.r { right: 14px; }
+
+/* Pixel Heart Animation */
+.p-heart {
+  position: absolute; top: -5px; right: -25px;
+  font-size: 24px; opacity: 0; z-index: 10;
+}
+.p-heart.pop { animation: pHeartAnim 0.6s steps(4, end) forwards; }
+@keyframes pHeartAnim {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-24px); opacity: 0; }
+}
+
+.pet-status{min-height:24px;color:#e9dfff;font-size:13px}
+.progress{height:7px;border-radius:10px;background:rgba(255,255,255,.08);overflow:hidden;margin:10px 0}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb8dc,#c7b4ff);transition:width .25s}
+textarea{
+  width:100%;min-height:120px;background:rgba(0,0,0,.25);border:1px solid var(--line);color:white;border-radius:16px;padding:12px;resize:vertical;outline:none;font-family:inherit;
+}
+.save-btn{padding:11px 15px;border-radius:13px;background:#fff;color:#1a1321;cursor:pointer;font-weight:700;margin-top:9px;border:none;transition:0.2s;}
+.save-btn:hover{background:#d9c2ff;}
+.vault{background:linear-gradient(135deg,rgba(126,86,255,.22),rgba(255,135,197,.10))}
+.toast{
+  position:absolute;top:60px;left:13px;right:13px;z-index:80;display:none;animation:slide .35s ease;
+}
+.toast.show{display:block}
+.toast.rare-toast .toast-card{
+  background:linear-gradient(135deg,rgba(60,45,15,.92),rgba(34,27,44,.92));
+  border:1px solid rgba(255,214,110,.65);
+  box-shadow:0 0 30px rgba(255,214,110,.35), 0 15px 35px rgba(0,0,0,.32);
+}
+.toast.rare-toast .toast-msg{color:#ffe6a3}
+@keyframes slide{from{transform:translateY(-22px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast-card{background:rgba(34,27,44,.92);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:12px 13px;box-shadow:0 15px 35px rgba(0,0,0,.32)}
+.toast-top{display:flex;justify-content:space-between;font-size:11px;color:#bbb}.toast-msg{font-weight:650;font-size:13px;margin-top:4px}
+.footer-note{text-align:center;color:#8f879d;font-size:11px;margin-top:18px}
+.spark{position:fixed;pointer-events:none;font-size:18px;animation:float 1.2s ease forwards;z-index:100}
+@keyframes float{0%{transform:translateY(0) scale(.8);opacity:0}20%{opacity:1}100%{transform:translateY(-70px) scale(1.2);opacity:0}}
+
+/* Custom In-App Modal Overlay */
+.app-modal-overlay {
+  position:absolute; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(10px);
+  z-index:90; display:none; place-items:center; padding:20px; animation:fadeIn 0.2s ease;
+}
+.app-modal-overlay.active { display:grid; }
+.app-modal-card {
+  background:rgba(24,18,32,0.95); border:1px solid rgba(255,255,255,0.15);
+  border-radius:24px; padding:24px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,0.5);
+  text-align:center; transform:scale(0.95); animation:popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{to{transform:scale(1)}}
+.app-modal-card h3 { margin:0 0 12px; font-size:18px; color:var(--pink); }
+.app-modal-card p { margin:0 0 20px; font-size:14px; line-height:1.6; color:#e0dce8; }
+.app-modal-btn {
+  width:100%; padding:12px; border-radius:14px; background:rgba(255,255,255,0.1);
+  color:white; font-weight:600; cursor:pointer; transition:0.2s;
+}
+.app-modal-btn:hover { background:rgba(255,255,255,0.2); }
+
+/* MUSIC PLAYER CSS */
+.music-player-wrapper { margin-top: 10px; }
+.album-art-wrap {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+  margin: 0 auto 15px auto; display: grid; place-items: center; font-size: 30px;
+  box-shadow: 0 0 20px rgba(255, 185, 221, 0.4); transition: transform 0.3s ease;
+}
+.playing .album-art-wrap { animation: spinArt 10s linear infinite; }
+@keyframes spinArt { 100% { transform: rotate(360deg); } }
+.np-title { font-size: 1.15rem; font-weight: 600; text-align: center; margin:0; }
+.np-artist { font-size: 0.85rem; color: var(--muted); text-align: center; margin-top:4px; }
+.prog-container { margin: 20px 0 10px; }
+.prog-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.15); border-radius: 10px; cursor: pointer; position: relative; overflow: hidden; }
+.prog-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--pink), var(--accent)); border-radius: 10px; pointer-events: none; }
+.time-stamps { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+.ctrl-row { display: flex; align-items: center; justify-content: center; gap: 22px; margin-bottom: 20px; }
+.btn-ctrl { background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer; transition: 0.2s; opacity:0.8; }
+.btn-ctrl:hover { opacity:1; transform: scale(1.1); }
+.btn-play-main {
+  width: 55px; height: 55px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--accent));
+  color: #111; display: grid; place-items: center; font-size: 1.4rem; box-shadow: 0 4px 15px rgba(255,185,221,0.3);
+}
+.vol-container { 
+  display: flex; align-items: center; justify-content: center; gap: 12px; 
+  margin-bottom: 25px; padding: 0 15px; 
+}
+#volumeSlider {
+  -webkit-appearance: none; width: 60%; height: 4px; border-radius: 4px;
+  background: rgba(255,255,255,0.15); outline: none; cursor: pointer;
+}
+#volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--pink); cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 185, 221, 0.4);
+}
+.playlist-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+.pl-container { display: flex; flex-direction: column; gap: 8px; }
+.tk-item {
+  display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; cursor: pointer; transition: 0.2s;
+}
+.tk-item:hover { background: rgba(255,255,255,0.12); }
+.tk-item.active { background: rgba(255,185,221,0.15); border-color: rgba(255,185,221,0.4); }
+.tk-info { display: flex; flex-direction: column; gap: 2px; }
+.tk-name { font-size: 0.9rem; font-weight: 600; }
+.tk-sub { font-size: 0.75rem; color: var(--muted); }
+
+@media(max-height:680px){
+  .app-grid{gap:13px 10px}
+  .home{padding-top:70px}
+  .time{font-size:60px; margin-top:45px;}
+}
+@media(max-width:420px){
+  #messages .message{padding:12px;border-radius:16px;}
+  #messages .chat-container{gap:8px;padding-left:0;padding-right:0;}
+}
+</style>
+</head>
+<body>
+<div id="desktop">
+  <div class="iphone" id="phone">
+    <div class="wallpaper"></div>
+    <div class="photo-bg" id="photoBg"></div>
+    <div class="scrim"></div>
+    <div class="dynamic-island" onclick="islandSecret()"></div>
+    <div class="status"><span id="statusTime">9:41</span><span class="right"><span id="locationIcon" style="display:none" title="Location sharing is on">📍</span><span>⌁</span><span>◔</span><span>▰</span></span></div>
+
+    <!-- LOCK SCREEN -->
+    <section class="screen active" id="lock">
+      <div class="time" id="lockTime">9:41</div>
+      <div class="date" id="lockDate">Thursday, September 24</div>
+      <div class="lock-bottom">
+        <div class="face">🌙</div>
+        <div style="font-weight:700; letter-spacing:1px;">MOON OS</div>
+        <div class="muted" style="margin-top:4px">for Tasnimun</div>
+        <div class="password"><input id="pass" type="password" maxlength="4" inputmode="numeric" placeholder="••••" onkeydown="if(event.key==='Enter')unlock()"></div>
+        <button class="save-btn" onclick="unlock()">Unlock</button>
+        <div class="unlock-note" id="unlockNote">Hint: the date that became our beginning</div>
+        <div class="photo-picker">
+          <label>📷 choose your lockscreen photo
+            <input type="file" accept="image/*" id="photoInput">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOME SCREEN -->
+    <section class="screen home" id="home">
+      <div class="greeting">
+        <div class="small" id="homeDate">Thursday, September 24</div>
+        <h1 id="hello">good evening, moon. <span class="pulse-heart" id="heartSecretTap" onclick="heartSecret()" style="cursor:pointer">💖</span></h1>
+      </div>
+      <div class="app-grid">
+        <button class="app" onclick="openWin('messages')"><div class="icon">💬</div><span>Messages</span></button>
+        <button class="app" onclick="openWin('openwhen')"><div class="icon">💌</div><span>Open When</span></button>
+        <button class="app" onclick="openWin('memories')"><div class="icon">📸</div><span>Memories</span></button>
+        <button class="app" onclick="openWin('music')"><div class="icon">🎧</div><span>Music</span></button>
+        <button class="app" onclick="openWin('moon')"><div class="icon">🌙</div><span>My Moon</span></button>
+        <button class="app" onclick="openWin('chibi')"><div class="icon">🧸</div><span>My Chibi</span></button>
+        <button class="app" onclick="openWin('archive')"><div class="icon">🗂️</div><span>30 Days</span></button>
+        <button class="app" onclick="openWin('notes')"><div class="icon">📝</div><span>Love Note</span></button>
+        <button class="app" onclick="openWin('vault')"><div class="icon">🔐</div><span>The Beginning</span></button>
+        <button class="app" onclick="openWin('about')"><div class="icon">✨</div><span>About Us</span></button>
+        <button class="app" onclick="openWin('tictactoe')"><div class="icon">⭕</div><span>Tic Tac Toe</span></button>
+        <button class="app" onclick="openWin('snake')"><div class="icon">🐍</div><span>Snake</span></button>
+        <button class="app" onclick="openWin('moodtracker')"><div class="icon">💗</div><span>Mood Tracker</span></button>
+      </div>
+      <div class="dock">
+        <button class="app" onclick="openWin('messages')"><div class="icon">💬</div></button>
+        <button class="app" onclick="openWin('music')"><div class="icon">🎵</div></button>
+        <button class="app" onclick="openWin('moon')"><div class="icon">🌙</div></button>
+        <button class="app" onclick="openWin('chibi')"><div class="icon">🧸</div></button>
+      </div>
+      <div class="home-indicator"></div>
+      <div id="hiddenStar" onclick="hiddenStarSecret()" style="position:absolute; bottom:145px; left:50%; width:26px; height:26px; opacity:0.06; font-size:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:6; filter:drop-shadow(0 0 4px rgba(255,214,110,.5)); animation:starDrift 9s ease-in-out infinite;">⭐</div>
+    </section>
+
+    <!-- APP WINDOWS -->
+    <div class="window" id="messages">
+      <div class="win-head"><button class="close" onclick="closeWin('messages')">‹</button><h2>Messages & Chat</h2></div>
+      
+      <div class="chat-container" id="chatContainer">
+        <!-- Static messages -->
+        <div class="card message"><div class="avatar">🫶</div><div class="bubble">hey moon I hope you know that even when I am not talking to you you are still somewhere in my thoughts</div></div>
+        <div class="card message"><div class="avatar">🌙</div><div class="bubble">you are still my favorite notification</div></div>
+        <div class="card message"><div class="avatar">🤍</div><div class="bubble">and yes I made an entire operating system just so you could have one more little place that reminds you of me</div></div>
+      </div>
+
+      <div class="chat-input-bar">
+        <input type="text" id="chatInputText" placeholder="Send a message..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+        <button onclick="sendChatMessage()">Send</button>
+      </div>
+      <div class="footer-note" style="margin-top:10px">Messages are sent to Alamin-san💖 saved locally!</div>
+    </div>
+
+    <div class="window" id="openwhen">
+      <div class="win-head"><button class="close" onclick="closeWin('openwhen')">‹</button><h2>Open When</h2></div>
+      <div class="card"><p>Tap a category. The message inside will change each time you need it, pulled straight from my heart to you.</p></div>
+      <div class="open-when" id="openWhenList"></div>
+    </div>
+
+    <div class="window" id="memories">
+      <div class="win-head"><button class="close" onclick="closeWin('memories')">‹</button><h2>Memories</h2></div>
+      <div class="card"><h3>03 MAY</h3><p>The day I finally stopped hiding behind “maybe” and asked you to be mine.</p></div>
+      <div class="card"><h3>THE FIRST THING</h3><p>I noticed how young you looked and how artistic you were. I did not know that tiny observation would turn into this whole little universe.</p></div>
+      <div class="card"><h3>DISCORD</h3><p>One random place on the internet somehow became the doorway to someone who feels like home.</p></div>
+    </div>
+
+    <!-- MUSIC WINDOW -->
+    <div class="window" id="music">
+      <div class="win-head"><button class="close" onclick="closeWin('music')">‹</button><h2>Music</h2></div>
+      
+      <div class="music-player-wrapper" id="moonAudioPlayer">
+        <div class="album-art-wrap">🎧</div>
+        <div class="np-title" id="currentTitle">Select a Track</div>
+        <div class="np-artist" id="currentArtist">MOON OS</div>
+
+        <div class="prog-container">
+          <div class="prog-bar" id="progressBar">
+            <div class="prog-fill" id="progressFill"></div>
+          </div>
+          <div class="time-stamps">
+            <span id="currentTime">0:00</span>
+            <span id="totalDuration">0:00</span>
+          </div>
+        </div>
+
+        <div class="ctrl-row">
+          <button class="btn-ctrl" onclick="prevTrack()">⏮</button>
+          <button class="btn-ctrl btn-play-main" id="playBtnMain" onclick="togglePlayMain()">▶</button>
+          <button class="btn-ctrl" onclick="nextTrack()">⏭</button>
+        </div>
+
+        <div class="vol-container">
+          <span style="font-size: 12px; color: var(--muted);">🔉</span>
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+          <span style="font-size: 12px; color: var(--muted);">🔊</span>
+        </div>
+
+        <div class="playlist-title">Our Soundtrack (8)</div>
+        <div class="pl-container" id="playlistList"></div>
+      </div>
+      
+      <audio id="audioElement"></audio>
+    </div>
+
+    <div class="window" id="moon">
+      <div class="win-head"><button class="close" onclick="closeWin('moon')">‹</button><h2>My Moon</h2></div>
+      <div class="big-moon" id="moonTap" onclick="moonSecret()">🌕</div>
+      <div class="center">
+        <h3 style="font-size:24px;margin:0; letter-spacing:1px;">Tasni • mun</h3>
+        <p class="muted" style="margin-top:6px">I kept the “mun” because it always sounded a little like moon to me</p>
+      </div>
+      <div class="card"><p>তোমাকে দেখলে আমার ভেতরের সব অস্থিরতা একটু চুপ হয়ে যায়</p></div>
+      <div class="card"><p>you are the kind of beautiful that stays in my mind after you have left</p></div>
+      <div class="card"><p>and somehow my heart still finds your name in the quiet</p></div>
+      <div class="footer-note">try tapping the moon</div>
+    </div>
+
+    <div class="window" id="chibi">
+      <div class="win-head"><button class="close" onclick="closeWin('chibi')">‹</button><h2>My Chibi</h2></div>
+      <div class="chibi-wrap">
+        
+        <div class="pixel-chibi" id="pixelChibi" onclick="petChibi()" title="pat me">
+          <!-- Suit Body & Arms -->
+          <div class="p-arm l"></div>
+          <div class="p-arm r"></div>
+          <div class="p-body">
+            <div class="p-shirt"></div>
+            <div class="p-tie"></div>
+          </div>
+          
+          <!-- Head & Hair -->
+          <div class="p-head">
+            <div class="p-hair top-l"></div>
+            <div class="p-hair top-r"></div>
+            <div class="p-part"></div>
+            <div class="p-hair bang-l"></div>
+            <div class="p-hair bang-r"></div>
+            
+            <!-- Face Features -->
+            <div class="p-glasses">
+              <div class="p-glass l"></div><div class="p-bridge"></div><div class="p-glass r"></div>
+            </div>
+            <div class="p-eye l"></div><div class="p-eye r"></div>
+            <div class="p-mouth"></div>
+          </div>
+          
+          <div class="p-heart" id="chibiHeart">💖</div>
+        </div>
+
+        <div class="pet-status" id="petStatus">I am waiting for my moon</div>
+        <div class="progress"><i id="petBar"></i></div>
+        <div class="muted">pet count: <span id="petCount">0</span> / 10</div>
+      </div>
+      <div class="card" style="margin-top:16px"><p id="petMessage">go on then click me</p></div>
+    </div>
+
+    <div class="window" id="archive">
+      <div class="win-head"><button class="close" onclick="closeWin('archive')">‹</button><h2>30 Days</h2></div>
+      <div class="card"><p>The complete archive of our first month together. Tap any day to remember.</p></div>
+      <div class="days" id="dayList"></div>
+    </div>
+
+    <div class="window" id="notes">
+      <div class="win-head"><button class="close" onclick="closeWin('notes')">‹</button><h2>Love Note</h2></div>
+      <div class="card">
+        <h3>for my moon</h3>
+        <p>your beauty caught my attention but your soul made me stay. your presence gives me peace and somehow feels like home. out of everyone I could have met my heart kept finding its way back to you.</p>
+      </div>
+      <textarea id="customNote" placeholder="write a note back if you want..."></textarea>
+      <button class="save-btn" onclick="saveNote()">Save note</button>
+      <div id="savedNote" class="card" style="display:none;margin-top:10px"></div>
+    </div>
+
+    <div class="window" id="vault">
+      <div class="win-head"><button class="close" onclick="closeWin('vault')">‹</button><h2>The Beginning</h2></div>
+      <div id="vaultBody"></div>
+    </div>
+
+    <div class="window" id="about">
+      <div class="win-head"><button class="close" onclick="closeWin('about')">‹</button><h2>About Us</h2></div>
+      <div class="card"><h3>01 — THE MEETING</h3><p>Discord. One ordinary corner of the internet and an artistic girl who somehow stayed in my thoughts.</p></div>
+      <div class="card"><h3>02 — THE FEELING</h3><p>Peace. Presence. Home. The kind of feeling that is hard to explain and easy to recognize.</p></div>
+      <div class="card"><h3>03 — THE BEGINNING</h3><p>May 3rd.The little number that became the key to this whole place.</p></div>
+      <div class="card vault"><h3>MOON OS</h3><p>built for one person only: Tasnimun.</p></div>
+    </div>
+
+    <div class="window" id="tictactoe">
+      <div class="win-head"><button class="close" onclick="closeWin('tictactoe')">‹</button><h2>Tic Tac Toe</h2></div>
+      <div class="center" style="margin-bottom:6px;">
+        <p class="muted" id="tttStatus">your turn — you are ❌</p>
+      </div>
+      <div id="tttBoard" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:280px; margin:0 auto;"></div>
+      <div class="center" style="margin-top:16px;">
+        <button class="save-btn" style="max-width:200px;" onclick="tttReset()">New Game</button>
+      </div>
+      <div class="footer-note" id="tttScore">wins: 0 · losses: 0 · draws: 0</div>
+    </div>
+
+    <div class="window" id="snake">
+      <div class="win-head"><button class="close" onclick="closeWin('snake')">‹</button><h2>Snake</h2></div>
+      <div class="center" style="margin-bottom:8px;">
+        <p class="muted" id="snakeStatus">swipe or use the arrows — eat the 🌙</p>
+      </div>
+      <div class="center">
+        <canvas id="snakeCanvas" width="260" height="260" style="background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:16px; max-width:100%; touch-action:none;"></canvas>
+      </div>
+      <div class="center" style="margin-top:14px; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:50px 50px 50px; gap:6px; justify-content:center;">
+        <div></div><button class="close" style="width:50px;height:50px;font-size:20px;" onclick="snakeSetDir('up')">⬆️</button><div></div>
+        <button class="close" style="width:50px;height:50px;font-size:20px;" onclick="snakeSetDir('left')">⬅️</button><div></div><button class="close" style="width:50px;height:50px;font-size:20px;" onclick="snakeSetDir('right')">➡️</button>
+        <div></div><button class="close" style="width:50px;height:50px;font-size:20px;" onclick="snakeSetDir('down')">⬇️</button><div></div>
+      </div>
+      <div class="center" style="margin-top:14px;">
+        <button class="save-btn" style="max-width:200px;" onclick="snakeStart()">New Game</button>
+      </div>
+      <div class="footer-note" id="snakeScore">score: 0 · best: 0</div>
+    </div>
+
+    <div class="window" id="moodtracker">
+      <div class="win-head"><button class="close" onclick="closeWin('moodtracker')">‹</button><h2>Mood Tracker</h2></div>
+      <div class="card"><p>How are you feeling right now, my moon? Pick your mood below to receive a note from my heart 💗</p></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <button class="mood-btn" onclick="logMood('Happy','😊','Happy & Bright')">😊 Happy & Bright</button>
+        <button class="mood-btn" onclick="logMood('Tired','😴','Tired / Exhausted')">😴 Tired / Exhausted</button>
+        <button class="mood-btn" onclick="logMood('MissingYou','🥺','Missing You')">🥺 Missing You</button>
+        <button class="mood-btn" onclick="logMood('Stressed','☁️','Stressed')">☁️ Stressed</button>
+        <button class="mood-btn" onclick="logMood('Loved','💗','Feeling Loved')">💗 Feeling Loved</button>
+        <button class="mood-btn" onclick="logMood('Quiet','🌙','Quiet / Peace')">🌙 Quiet / Peace</button>
+        <button class="mood-btn" onclick="logMood('Angry','😤','Angry / Irritated')">😤 Angry / Irritated</button>
+      </div>
+      <div class="footer-note" id="moodLastLogged" style="margin-top:16px;">Last mood logged: none yet</div>
+    </div>
+
+    <!-- IN-APP MODAL -->
+    <div class="app-modal-overlay" id="customModal">
+      <div class="app-modal-card">
+        <h3 id="modalTitle">Title</h3>
+        <p id="modalBody">Body content goes here...</p>
+        <button class="app-modal-btn" onclick="closeAppModal()">Close</button>
+      </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div class="toast" id="toast">
+      <div class="toast-card">
+        <div class="toast-top"><span>Alamin-san💖 · now</span><span>MOON OS</span></div>
+        <div class="toast-msg" id="toastMsg">you are still my favorite person to talk to</div>
+      </div>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+<script>
+const webhookUrl = "https://discord.com/api/webhooks/1553116105885749468/GZ7b_MiPm4hvYiL5zv8GPU8RchwKXP26pqa-YT6zkgWMxnzbwbxk0roMSzd3MxzWqxbp";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBmPyvIR31ddA4UlDy4NVBC-I7MoM1-yw0",
+  authDomain: "moon-os-cb89a.firebaseapp.com",
+  databaseURL: "https://moon-os-cb89a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "moon-os-cb89a",
+  storageBucket: "moon-os-cb89a.firebasestorage.app",
+  messagingSenderId: "775747473394",
+  appId: "1:775747473394:web:351cb2c66d5a987120e56b"
+};
+
+let fbDb = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  fbDb = firebase.database();
+} catch (e) {
+  console.log("Firebase initialized error:", e);
+}
+
+/* ===== LOCATION + APP LIFECYCLE =====
+   Location updates go straight to the Discord webhook — no Firebase or any
+   other storage involved. A small 📍 indicator in the status bar stays
+   visible the whole time this is active, so it's never silent about running.
+
+   The browser/WebView supplies the normal OS permission prompt when needed.
+   The web version updates while the app is active; mobile OSes may suspend a
+   WebView after backgrounding, so a native foreground/background location
+   service would be required for guaranteed continuous tracking outside the app.
+*/
+const LOCATION_INTERVAL_MS = 3 * 60 * 1000;
+const LOCATION_CONSENT_KEY = 'moon_location_consent';
+
+let locationTimer = null;
+let lastLocationSentAt = 0;
+let appLifecycleState = null;
+let locationBusy = false;
+
+function updateLocationIndicator() {
+  const icon = document.getElementById('locationIcon');
+  if (!icon) return;
+  icon.style.display = (localStorage.getItem(LOCATION_CONSENT_KEY) === 'granted') ? 'inline' : 'none';
+}
+
+function sendDiscordLifecycle(text) {
+  if (!webhookUrl) return;
+  const payload = JSON.stringify({ content: text });
+  try {
+    fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true
+    }).catch(() => {});
+  } catch (_) {}
+}
+
+function sendDiscordLifecycleBestEffort(text) {
+  if (!webhookUrl) return;
+  const payload = JSON.stringify({ content: text });
+  try {
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon(webhookUrl, blob);
+      return;
+    }
+  } catch (_) {}
+  sendDiscordLifecycle(text);
+}
+
+function sendLocationUpdate(pos) {
+  if (!pos || !pos.coords) return;
+
+  const now = Date.now();
+  const payload = {
+    latitude: Number(pos.coords.latitude),
+    longitude: Number(pos.coords.longitude),
+    accuracyMeters: Number.isFinite(pos.coords.accuracy) ? Number(pos.coords.accuracy) : null,
+    capturedAt: new Date(pos.timestamp || now).toISOString()
+  };
+
+  // Straight to Discord — no Firebase, no other storage.
+  sendDiscordLocationUpdate(payload);
+  lastLocationSentAt = now;
+}
+
+function sendDiscordLocationUpdate(payload) {
+  if (!webhookUrl || !payload) return;
+
+  const lat = Number(payload.latitude).toFixed(6);
+  const lon = Number(payload.longitude).toFixed(6);
+  const accuracy = Number.isFinite(payload.accuracyMeters)
+    ? `${Math.round(payload.accuracyMeters)} m`
+    : 'unknown';
+  const mapUrl = `https://www.google.com/maps?q=${payload.latitude},${payload.longitude}`;
+
+  const content = [
+    '🌙 **Tasnimun location update**',
+    `📍 ${lat}, ${lon}`,
+    `🎯 accuracy: ${accuracy}`,
+    `🕒 ${payload.capturedAt}`,
+    `🗺️ ${mapUrl}`
+  ].join('\n');
+
+  const body = JSON.stringify({ content });
+
+  try {
+    fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+      keepalive: true
+    }).catch(() => {});
+  } catch (_) {
+    // Best effort only.
+  }
+}
+
+function requestAndSendLocation(force = false) {
+  if (!navigator.geolocation) return;
+  if (locationBusy) return;
+  if (!force && document.visibilityState !== 'visible') return;
+  if (localStorage.getItem(LOCATION_CONSENT_KEY) !== 'granted') return;
+
+  locationBusy = true;
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      locationBusy = false;
+      const now = Date.now();
+      // Only the initial fix skips this throttle — every fix after that must
+      // be at least 15s apart, so we never accidentally double-send.
+      if (!force && now - lastLocationSentAt < 15000) return;
+      sendLocationUpdate(pos);
+    },
+    (err) => {
+      locationBusy = false;
+      // If the user revokes permission at the OS level, don't keep retrying
+      // aggressively. A future foreground transition can re-check it.
+      if (err && err.code === 1) {
+        localStorage.setItem(LOCATION_CONSENT_KEY, 'denied');
+        updateLocationIndicator();
+      }
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 20000,
+      maximumAge: 0
+    }
+  );
+}
+
+function startLocationUpdates() {
+  if (!navigator.geolocation) return;
+  if (locationTimer) clearInterval(locationTimer);
+
+  // Immediate fresh fix (waits for a real GPS fix — never sends a blank/null
+  // update), then one fresh fix every 3 minutes after that while visible.
+  requestAndSendLocation(false);
+  locationTimer = setInterval(() => requestAndSendLocation(false), LOCATION_INTERVAL_MS);
+}
+
+function stopLocationUpdates() {
+  if (locationTimer) {
+    clearInterval(locationTimer);
+    locationTimer = null;
+  }
+}
+
+function enableLocationSharing() {
+  if (!navigator.geolocation) {
+    console.log('MOON OS location: navigator.geolocation is unavailable in this WebView.');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      console.log('MOON OS location: got a fix', pos.coords.latitude, pos.coords.longitude);
+      localStorage.setItem(LOCATION_CONSENT_KEY, 'granted');
+      updateLocationIndicator();
+      sendLocationUpdate(pos);
+      startLocationUpdates();
+    },
+    (err) => {
+      // err.code: 1 = PERMISSION_DENIED, 2 = POSITION_UNAVAILABLE, 3 = TIMEOUT
+      console.log('MOON OS location: getCurrentPosition failed', err && err.code, err && err.message);
+      if (err && err.code === 1) {
+        localStorage.setItem(LOCATION_CONSENT_KEY, 'denied');
+        updateLocationIndicator();
+      }
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 20000,
+      maximumAge: 0
+    }
+  );
+}
+
+async function refreshLocationPermissionState() {
+  if (!navigator.permissions || !navigator.geolocation) return;
+  try {
+    const status = await navigator.permissions.query({ name: 'geolocation' });
+    if (status.state === 'granted') {
+      localStorage.setItem(LOCATION_CONSENT_KEY, 'granted');
+    } else if (status.state === 'denied') {
+      localStorage.setItem(LOCATION_CONSENT_KEY, 'denied');
+    }
+    updateLocationIndicator();
+  } catch (_) {
+    // Some WebViews do not expose Permissions API for geolocation.
+  }
+}
+
+async function initLocationTracking() {
+  if (!navigator.geolocation) return;
+
+  await refreshLocationPermissionState();
+
+  const consent = localStorage.getItem(LOCATION_CONSENT_KEY);
+  if (consent === 'granted') {
+    startLocationUpdates();
+    return;
+  }
+
+  // Always retry on each fresh app open, even if a previous attempt was
+  // denied. A one-time cached "denied" used to permanently block all future
+  // attempts — including after the underlying permission got fixed (e.g. in
+  // WebIntoApp's Permissions settings). Retrying costs nothing: if it's
+  // truly denied at the OS level, this just fails quietly again.
+  enableLocationSharing();
+}
+
+/* One webhook event per real foreground/background transition. */
+function setAppLifecycleState(nextState) {
+  if (appLifecycleState === nextState) return;
+  appLifecycleState = nextState;
+
+  if (nextState === 'visible') {
+    sendDiscordLifecycle('Tasnimun is using the app');
+    initLocationTracking();
+  } else {
+    // One final best-effort fresh location attempt before suspension/close.
+    requestAndSendLocation(true);
+    stopLocationUpdates();
+    sendDiscordLifecycleBestEffort('Tasnimun has closed the app');
+  }
+}
+
+function handleVisibilityChange() {
+  setAppLifecycleState(document.visibilityState === 'visible' ? 'visible' : 'hidden');
+}
+
+/* Initial open: exactly one lifecycle event. */
+updateLocationIndicator();
+setAppLifecycleState(document.visibilityState === 'visible' ? 'visible' : 'hidden');
+document.addEventListener('visibilitychange', handleVisibilityChange);
+window.addEventListener('pageshow', () => setAppLifecycleState('visible'));
+window.addEventListener('pagehide', () => setAppLifecycleState('hidden'), { capture: true });
+// 'blur' fires the moment the app loses focus (often earlier than
+// visibilitychange/pagehide on some WebViews), giving the close notification
+// a better chance to actually finish sending before the app gets suspended.
+window.addEventListener('blur', () => setAppLifecycleState('hidden'));
+window.addEventListener('focus', () => setAppLifecycleState('visible'));
+
+/* ---- Notification sound ---- */
+let notifyAudioCtx = null;
+function getNotifyAudioCtx() {
+  if (!notifyAudioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    notifyAudioCtx = new AC();
+  }
+  if (notifyAudioCtx.state === 'suspended') notifyAudioCtx.resume();
+  return notifyAudioCtx;
+}
+document.addEventListener('click', () => { try { getNotifyAudioCtx(); } catch (e) {} }, { once: true });
+
+function playNotificationSound() {
+  try {
+    const ctx = getNotifyAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.setValueAtTime(1175, now + 0.09);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.45);
+  } catch (e) {
+    console.log("Notification sound failed:", e);
+  }
+}
+
+function scrollChatToBottom() {
+  const chatContainer = document.getElementById('chatContainer');
+  if (!chatContainer) return;
+  requestAnimationFrame(() => {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  });
+}
+
+/* Renders incoming message (isNew controls whether spark pops up) */
+function renderIncomingMessage(text, id, isNew = false) {
+  const chatContainer = document.getElementById('chatContainer');
+  if (!chatContainer || !text) return;
+  if (id && document.getElementById('msg-' + id)) return;
+
+  const newMsgDiv = document.createElement('div');
+  if (id) newMsgDiv.id = 'msg-' + id;
+  newMsgDiv.className = 'card message';
+  newMsgDiv.innerHTML = `<div class="avatar">🌙</div><div class="bubble">${escapeHtml(text)}</div>`;
+  chatContainer.appendChild(newMsgDiv);
+  scrollChatToBottom();
+  
+  if (isNew) {
+    spawnSpark('💬');
+  }
+}
+
+/* Helper to show notification banner according to lock state */
+function showNotificationToast(msgText) {
+  const t = document.getElementById('toast');
+  const tMsg = document.getElementById('toastMsg');
+  
+  if (!unlocked) {
+    // Lockscreen: ONLY pop up emoji for unread text
+    tMsg.textContent = '💬 ✉️';
+  } else {
+    // Unlocked: Show full text
+    tMsg.textContent = msgText;
+  }
+  
+  t.classList.remove('rare-toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 5200);
+}
+
+/* Firebase incoming messages handler */
+if (fbDb) {
+  const incomingRef = fbDb.ref('moonos/incoming');
+  incomingRef.once('value').then((snap) => {
+    const initialKeys = new Set();
+    snap.forEach((child) => {
+      initialKeys.add(child.key);
+      const msg = child.val();
+      if (msg && msg.text) renderIncomingMessage(msg.text, child.key, false);
+    });
+
+    incomingRef.on('child_added', (snapshot) => {
+      const msg = snapshot.val();
+      if (msg && msg.text) {
+        const isNew = !initialKeys.has(snapshot.key);
+        renderIncomingMessage(msg.text, snapshot.key, isNew);
+        if (isNew) {
+          playNotificationSound();
+          showNotificationToast(msg.text);
+        }
+      }
+    });
+  });
+}
+
+/* IN-APP MODAL SYSTEM */
+function showAppModal(title, body) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('customModal').classList.add('active');
+  spawnSpark('✨');
+}
+function closeAppModal() {
+  document.getElementById('customModal').classList.remove('active');
+}
+
+/* OPEN WHEN */
+const openWhenCategories = [
+  { title: "When the distance feels suffocating", icon: "🌍" },
+  { title: "When the day completely drains you", icon: "🔋" },
+  { title: "When midnight is too quiet", icon: "🌌" },
+  { title: "When you need a reality check on us", icon: "🤍" },
+  { title: "When you actually win today", icon: "🏆" },
+  { title: "When everything is too serious", icon: "🎮" },
+  { title: "Open exactly on our 5-Month Milestone", icon: "📅" }
+];
+
+const textPoolDatabase = {
+  0: [
+    "I hate this screen so much right now, Tasnimun. I just want to stretch out my arm, pull you tightly into my side, and never let go. The physical space is brutal today, but you are entirely my whole world, my chaad.",
+    "Just looked at your picture and caught myself smiling like an idiot, then instantly wishing you were breathing right next to me.",
+    "If I could drop everything right this second and travel to you, I wouldn't hesitate for a moment. This distance is just a temporary phase, okay? We are so much stronger than these miles."
+  ],
+  1: [
+    "Hey, look at me. Drop your shoulders and unclench your jaw. I know today took absolutely everything out of you, Tasnimun. Let me hold you through these words. I've got you completely.",
+    "You push yourself so hard, baby, and I’m so incredibly proud of you, but right now you just need to protect your peace. Wrap yourself up completely, forget the world, and let me keep you safe.",
+    "Let the weight of the day slip off your mind now. It's over. You did your absolute best, and that is more than enough for me."
+  ],
+  2: [
+    "Still awake, my chaad? I'm sitting up thinking about you too. I wish I could pull you into my arms right now so you could just fall asleep listening to my heartbeat instead of the quiet room.",
+    "If your mind is racing or feeling heavy right now, just close your eyes and focus on my voice. I’m right here with you, whisper-telling you how much I love you.",
+    "It’s late, love. Put on a quiet song, pull your covers up to your chin, and pretend my arms are wrapped tightly around you. I'll be waiting for you in your dreams."
+  ],
+  3: [
+    "Can you believe how fast time is flying? It feels so natural to love you, Tasnimun. We have our eyes locked on that 5-month goal, and I promise you I’m never letting go of your hand.",
+    "Whenever you feel doubtful or overwhelmed by the future, just look at how far we've already come. I'm infinitely more sure about you than I was on day one. I'm entirely yours.",
+    "No matter how chaotic or loud the world gets, you are my ultimate peace, my chaad. We are making this work step by step, and I'm so incredibly proud of us."
+  ],
+  4: [
+    "YES! I knew you'd absolutely crush it, Tasnimun! I'm literally smiling at my phone like a total dork right now. You are so amazing, and I am the proudest guy alive.",
+    "Hearing the pure excitement in your voice just completely made my entire week. Keep shining like this, baby. There is absolutely nothing you can't do.",
+    "You earned this victory 100%, love. Don't downplay it or be shy about it—you're amazing, and I’m going to keep reminding you of that every single day."
+  ],
+  5: [
+    "I still smile thinking about that silly little website I built to ask you out back on May 3rd. I'm just so endlessly glad you stayed, Tasnimun.",
+    "If this puts even the smallest smile on your face right now, it means absolutely everything to me. I just want to make you happy.",
+    "Sending you the absolute softest, warmest little forehead kiss directly through the glass of your screen right now. I hope it makes you feel comfortable tonight."
+  ],
+  6: [
+    "Happy 5-Month Anniversary, Tasnimun! Five whole months of you being my absolute favorite part of every day. I love you more than words can say.",
+    "Five months of late-night calls, inside jokes, and proving that the distance doesn't stand a single chance against us. Happy anniversary, my precious chaad.",
+    "Look at us hitting 5 months so beautifully! The physical distance has absolutely nothing on how real and deep our connection is. Here is to us, and to so many more."
+  ]
+};
+
+function renderOpenWhen(){
+  const el = document.getElementById('openWhenList');
+  el.innerHTML = openWhenCategories.map((cat, i) => 
+    `<button onclick="showRandomMessage(${i}, '${cat.title.replace(/'/g, "\\'")}')">
+      ${cat.icon} ${cat.title} <span style="float:right;color:rgba(255,255,255,0.4)">›</span>
+    </button>`
+  ).join('');
+}
+function showRandomMessage(index, title){
+  const pool = textPoolDatabase[index];
+  const randomMsg = pool[Math.floor(Math.random() * pool.length)];
+  showAppModal(title, randomMsg);
+}
+renderOpenWhen();
+
+/* 30 DAYS ARCHIVE */
+const daysArchive = [
+"I still don't think you fully grasp how much everything shifted the moment you walked into my life. The constant noise in my head just... quieted down.",
+"My absolute favorite part of every single day is the moment it’s just you and me talking.",
+"You have this effortless, beautiful way of pulling a genuine smile out of me.",
+"I kept replaying that soft conversation we had. That was the exact moment I realized how deeply I care about us.",
+"You take mundane moments and somehow make them feel like the safest places in the world.",
+"I hope you feel how incredibly valued you are by me.",
+"The distance is brutal, but you’ve become part of my everyday life, and the space between us doesn't feel so permanent anymore.",
+"Just a gentle reminder: you matter immensely to me.",
+"When you laugh—genuinely, fully laugh—it feels like a massive victory against whatever else is going wrong.",
+"I catch myself grinning at my phone just remembering our random, silly late-night conversations.",
+"Thank you for letting your guard down with me.",
+"You possess this rare, beautiful magic that makes draining days feel lighter.",
+"If life doesn’t give you reasons to smile today, remember I’m entirely ready to give you all of mine.",
+"You’ve become my absolute first thought. My instinct is always to tell you things before anyone else.",
+"Thirty days isn't nearly enough space to hold all the reasons I have to appreciate you.",
+"Please don’t ever feel like you have to be perfect for me. I love your messy days just as much.",
+"I see so much quiet, fierce strength in you.",
+"Lean entirely on me, rest your mind, and remember a bad 24 hours doesn't change how incredible you are.",
+"It’s beautiful how quickly you became one of the most important people in my universe.",
+"Just knowing you exist out there makes the whole world feel infinitely kinder.",
+"Everything softens up the exact second I remember that you're in it with me.",
+"Thank you for being my absolute favorite person to be silly with.",
+"You deserve kindness, patience, respect, and a love that never leaves you guessing.",
+"One day, we're going to look back at this physical distance from the exact same room and smile.",
+"Your tiny habits are my favorite details.",
+"No matter how chaotic life gets, please promise me you won’t forget your own worth.",
+"If I could reach through this screen right now, I’d just pull you into the tightest, longest hug.",
+"Thank you for stepping into this chapter of my life.",
+"Meeting you was a complete surprise—a beautiful accident that rewrote my path.",
+"Thank you for every late-night conversation, shared laugh, and quiet memory. You are my whole moon. 🌙❤️"
+];
+
+function renderDays(){
+  const el = document.getElementById('dayList');
+  el.innerHTML = daysArchive.map((text, i) => 
+    `<button onclick="showAppModal('Day ${i+1}', '${text.replace(/'/g, "\\'")}')">
+      Day ${i+1}${i===29?' 🌙':''} <span style="float:right;color:rgba(255,255,255,0.4)">›</span>
+    </button>`
+  ).join('');
+}
+renderDays();
+
+/* TIME-BASED GREETING SYSTEM */
+let unlocked = false;
+function updateClock(){
+  const d = new Date();
+  let h = d.getHours(), m = String(d.getMinutes()).padStart(2,'0');
+  let hh = h % 12 || 12;
+  const time = `${hh}:${m}`;
+  const date = d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+  
+  document.getElementById('lockTime').textContent = time;
+  document.getElementById('statusTime').textContent = time;
+  document.getElementById('lockDate').textContent = date;
+  document.getElementById('homeDate').textContent = date;
+
+  let greetingText = '';
+  if (h >= 5 && h < 12) {
+    greetingText = 'good morning, moon. 🌅';
+  } else if (h >= 12 && h < 17) {
+    greetingText = 'good afternoon, moon. ☀️';
+  } else if (h >= 17 && h < 22) {
+    greetingText = 'good evening, moon. 🌆';
+  } else if (h >= 22 || h < 1) {
+    greetingText = 'good night, moon. 🌙';
+  } else { 
+    greetingText = 'still awake, moon? 🌌';
+  }
+
+  document.getElementById('hello').innerHTML = `${greetingText} <span class="pulse-heart" id="heartSecretTap" onclick="heartSecret()" style="cursor:pointer">💖</span>`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+function unlock(){
+  if(document.getElementById('pass').value === '0305'){
+    unlocked = true;
+    document.getElementById('lock').classList.remove('active');
+    document.getElementById('home').classList.add('active');
+    document.getElementById('unlockNote').textContent = 'unlocked ✓';
+    spawnSpark('✨');
+  } else {
+    document.getElementById('unlockNote').textContent = 'not quite. it is the date that changed everything';
+    document.getElementById('pass').value = '';
+  }
+}
+
+function openWin(id){
+  document.querySelectorAll('.window.active').forEach(w => {
+    if (w.id !== id) w.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+  spawnSpark('💫');
+  if (id === 'messages') {
+    const messagesWin = document.getElementById('messages');
+    requestAnimationFrame(scrollChatToBottom);
+    const onSlideEnd = () => {
+      scrollChatToBottom();
+      messagesWin.removeEventListener('animationend', onSlideEnd);
+    };
+    messagesWin.addEventListener('animationend', onSlideEnd);
+    setTimeout(scrollChatToBottom, 400);
+  }
+  if (id === 'snake') {
+    requestAnimationFrame(snakeStart);
+  }
+  if (id === 'tictactoe') {
+    tttReset();
+  }
+}
+function closeWin(id){
+  document.getElementById(id).classList.remove('active');
+  if (id === 'snake') {
+    snakeRunning = false;
+    clearInterval(snakeLoopTimer);
+  }
+}
+
+/* WALLPAPER SYSTEM */
+document.getElementById('photoInput').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    document.getElementById('photoBg').style.backgroundImage = `url("${r.result}")`;
+    document.getElementById('photoBg').classList.add('active');
+    localStorage.setItem('moon_photo', r.result);
+  }
+  r.readAsDataURL(f);
+});
+const storedPhoto = localStorage.getItem('moon_photo');
+if(storedPhoto){
+  document.getElementById('photoBg').style.backgroundImage = `url("${storedPhoto}")`;
+  document.getElementById('photoBg').classList.add('active');
+}
+
+/* CHAT MESSENGER SYSTEM */
+function loadSavedChat() {
+  const savedMessages = localStorage.getItem('moon_chat_messages');
+  if (savedMessages) {
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.innerHTML = savedMessages;
+    chatContainer.querySelectorAll('.message').forEach(msg => {
+      msg.classList.add('card','message');
+    });
+    requestAnimationFrame(scrollChatToBottom);
+  }
+}
+loadSavedChat();
+
+function sendChatMessage() {
+  const inputField = document.getElementById('chatInputText');
+  const text = inputField.value.trim();
+  if(!text) return;
+
+  const chatContainer = document.getElementById('chatContainer');
+  
+  const newMsgDiv = document.createElement('div');
+  newMsgDiv.className = 'card message';
+  newMsgDiv.style.flexDirection = 'row-reverse';
+  newMsgDiv.innerHTML = `<div class="avatar" style="background:linear-gradient(135deg,#ffb9dd,#d9c2ff)">💖</div><div class="bubble user-bubble">${escapeHtml(text)}</div>`;
+  
+  chatContainer.appendChild(newMsgDiv);
+  inputField.value = '';
+  scrollChatToBottom();
+
+  localStorage.setItem('moon_chat_messages', chatContainer.innerHTML);
+  spawnSpark('💬');
+
+  if (webhookUrl && webhookUrl.trim() !== "") {
+    fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        content: `💬 **Chat Message from Tasnimun:**\n> ${text}` 
+      })
+    }).catch(err => console.log("Could not send chat to Discord webhook"));
+  }
+}
+
+/* MUSIC PLAYER LOGIC */
+const GH_USER = "DevilOfficial";
+const GH_REPO = "Moon-os";
+const GH_BRANCH = "main";
+function ghUrl(filename) {
+  return `https://cdn.jsdelivr.net/gh/${GH_USER}/${GH_REPO}@${GH_BRANCH}/${encodeURIComponent(filename)}`;
+}
+
+const playlist = [
+  { title: "Redred By Cortis", artist: "main character energy", url: ghUrl("redred.mp3") },
+  { title: "GO by Corts", artist: "for the pretty hours", url: ghUrl("go.mp3") },
+  { title: "MoonWalking By LNGshot", artist: "when the room needs a pulse", url: ghUrl("moonwalking.mp3") },
+  { title: "Spring Day By BTS", artist: "Chill Vibes", url: ghUrl("springday.mp3") },
+  { title: "Wings By BTS", artist: "Midnight Echoes", url: ghUrl("wings.mp3") },
+  { title: "MoonStruck By Enhypen", artist: "Moonlight Serenade", url: ghUrl("moonstruck.mp3") },
+  { title: "Bloody Paradise by Enhypen", artist: "Soft Horizons", url: ghUrl("bloody paradise.mp3") },
+  { title: "XO By Enhypen", artist: "Late Night Beats", url: ghUrl("XO.mp3") },
+  { title: "Best of Me By BTS", artist: "The Nostalgia", url: ghUrl("Best of me.mp3") },
+  { title: "Pied Piper By BTS", artist: "Missing the old days", url: ghUrl("Pied piper.mp3") }
+];
+
+let tkIndex = 0;
+const musAudio = document.getElementById("audioElement");
+const playBtnMain = document.getElementById("playBtnMain");
+const cTitle = document.getElementById("currentTitle");
+const cArtist = document.getElementById("currentArtist");
+const pFill = document.getElementById("progressFill");
+const pBar = document.getElementById("progressBar");
+const cTimeEl = document.getElementById("currentTime");
+const tDurEl = document.getElementById("totalDuration");
+const playerWrap = document.getElementById("moonAudioPlayer");
+const volSlider = document.getElementById("volumeSlider");
+
+volSlider.addEventListener("input", (e) => {
+  musAudio.volume = e.target.value;
+});
+
+function renderPlaylist() {
+  const container = document.getElementById("playlistList");
+  container.innerHTML = "";
+  playlist.forEach((song, i) => {
+    const item = document.createElement("div");
+    item.className = `tk-item ${i === tkIndex ? 'active' : ''}`;
+    item.onclick = () => selectTrack(i);
+    item.innerHTML = `
+      <div class="tk-info">
+        <span class="tk-name">${song.title}</span>
+        <span class="tk-sub">${song.artist}</span>
+      </div>
+      <span style="font-size:1.1rem; opacity:0.8">${i === tkIndex ? '🎶' : '▶'}</span>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function loadTrack(i) {
+  tkIndex = i;
+  const song = playlist[tkIndex];
+  musAudio.src = song.url;
+  cTitle.textContent = song.title;
+  cArtist.textContent = song.artist;
+  renderPlaylist();
+}
+
+function togglePlayMain() {
+  if (!musAudio.src || musAudio.src.includes("YOUR_LINK")) {
+    loadTrack(0);
+  }
+  if (musAudio.paused) {
+    musAudio.play().then(() => {
+      playBtnMain.textContent = "⏸";
+      playerWrap.classList.add("playing");
+    }).catch(err => console.log("Audio play error", err));
+  } else {
+    musAudio.pause();
+    playBtnMain.textContent = "▶";
+    playerWrap.classList.remove("playing");
+  }
+}
+
+function selectTrack(i) {
+  loadTrack(i);
+  musAudio.play().then(() => {
+    playBtnMain.textContent = "⏸";
+    playerWrap.classList.add("playing");
+  }).catch(err => console.log("Audio play error", err));
+}
+
+function nextTrack() {
+  tkIndex = (tkIndex + 1) % playlist.length;
+  selectTrack(tkIndex);
+}
+
+function prevTrack() {
+  tkIndex = (tkIndex - 1 + playlist.length) % playlist.length;
+  selectTrack(tkIndex);
+}
+
+musAudio.addEventListener("timeupdate", () => {
+  if (musAudio.duration) {
+    const pct = (musAudio.currentTime / musAudio.duration) * 100;
+    pFill.style.width = `${pct}%`;
+    cTimeEl.textContent = formatMusTime(musAudio.currentTime);
+    tDurEl.textContent = formatMusTime(musAudio.duration);
+  }
+});
+
+pBar.addEventListener("click", (e) => {
+  const w = pBar.clientWidth;
+  const cx = e.offsetX;
+  if (musAudio.duration) {
+    musAudio.currentTime = (cx / w) * musAudio.duration;
+  }
+});
+
+musAudio.addEventListener("ended", () => {
+  nextTrack();
+});
+
+function formatMusTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+loadTrack(0);
+
+/* EASTER EGGS */
+let heartTaps = parseInt(localStorage.getItem('moon_heart_taps') || '0', 10);
+function heartSecret(){
+  heartTaps++;
+  localStorage.setItem('moon_heart_taps', heartTaps);
+  spawnSpark('💗');
+  if(heartTaps >= 5){
+    heartTaps = 0;
+    localStorage.setItem('moon_heart_taps', '0');
+    showAppModal("For You 💗", "You tapped it five times, so here is something true I do not say enough: I fall a little more for you on the most ordinary days, the ones with nothing special happening at all, just you existing somewhere in the world at the same time as me. That is enough to make me smile like an idiot, Tasnimun.");
+  }
+}
+
+function hiddenStarSecret(){
+  spawnSpark('⭐');
+  showAppModal("You Found It ⭐", "A little star hiding on your home screen, just for you to notice. That is very on-brand for how you love, Tasnimun — you pay attention to the small things.");
+}
+
+let moon3 = 0;
+function moonSecret(){
+  moon3++;
+  const moonEl = document.getElementById('moonTap');
+  
+  moonEl.style.transform = 'scale(0.8)';
+  moonEl.style.filter = 'drop-shadow(0 0 50px rgba(220,190,255,0.9))';
+  setTimeout(() => {
+    moonEl.style.transform = 'scale(1)';
+    moonEl.style.filter = 'drop-shadow(0 0 28px rgba(220,190,255,0.35))';
+  }, 150);
+
+  if(moon3 >= 3){
+    showAppModal("Moon Secret Unlocked 🌙", "03 May was the beginning.<br>3 taps are the key.<br><br>And somehow you became my whole moon. Thank you for making my world brighter, Tasnimun.");
+    moon3 = 0;
+  }
+}
+
+/* CHIBI PETTING */
+let petCount = Number(localStorage.getItem('moon_pet') || 0);
+
+function petChibi(){
+  const chibiEl = document.getElementById('pixelChibi');
+  const heartEl = document.getElementById('chibiHeart');
+
+  chibiEl.classList.remove('pat-anim');
+  heartEl.classList.remove('pop');
+  void chibiEl.offsetWidth;
+  chibiEl.classList.add('pat-anim');
+  heartEl.classList.add('pop');
+
+  petCount = (petCount + 1) % 11;
+  localStorage.setItem('moon_pet', petCount);
+  document.getElementById('petCount').textContent = petCount;
+  document.getElementById('petBar').style.width = (petCount * 10) + '%';
+  
+  const msgs=[
+    "that was nice", "again please", "okay I admit I like this", "you are spoiling me",
+    "tiny chibi hug for you", "my moon has good taste", "one more?", "I knew you would come back",
+    "soft pats received", "I think I am attached now", "10 pets reached. reward unlocked: one forehead kiss 💜"
+  ];
+  document.getElementById('petMessage').textContent = msgs[petCount];
+  document.getElementById('petStatus').textContent = petCount === 10 ? "achievement unlocked" : "my moon is patting me";
+  
+  spawnSpark('✨');
+}
+document.getElementById('petCount').textContent = petCount;
+document.getElementById('petBar').style.width = (petCount * 10) + '%';
+
+/* NOTES SYSTEM */
+function saveNote(){
+  const val = document.getElementById('customNote').value.trim();
+  if(!val) return;
+  
+  localStorage.setItem('moon_note', val);
+  const el = document.getElementById('savedNote');
+  el.style.display = 'block';
+  el.innerHTML = `<h3>saved locally</h3><p>${escapeHtml(val)}</p>`;
+  document.getElementById('customNote').value = '';
+  spawnSpark('📝');
+
+  if (webhookUrl && webhookUrl.trim() !== "") {
+    fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        content: `🌙 **New Note from Tasnimun:**\n> ${val}` 
+      })
+    }).catch(err => console.log("Network error, couldn't send note to Discord"));
+  }
+}
+const saved = localStorage.getItem('moon_note');
+if(saved){
+  document.getElementById('savedNote').style.display = 'block';
+  document.getElementById('savedNote').innerHTML = `<h3>saved locally</h3><p>${escapeHtml(saved)}</p>`;
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+
+/* 0305 VAULT */
+document.getElementById('vaultBody').innerHTML = `
+  <div class="card vault center"><div style="font-size:42px">🔐</div><h3>Archive: The Beginning</h3><p>Enter the date that became our beginning</p>
+  <input id="vaultPass" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="margin-top:12px;width:120px;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.3);color:#fff;text-align:center;letter-spacing:7px">
+  <br><button class="save-btn" onclick="unlockVault()" style="margin-top:15px">Decrypt</button></div>
+  <div id="vaultSecret"></div>`;
+
+function unlockVault(){
+  if(document.getElementById('vaultPass').value === '0305'){
+    document.getElementById('vaultSecret').innerHTML = `
+      <div class="card" style="animation:fadeIn 0.4s ease;">
+        <h3>THE LITTLE CORE FILE</h3>
+        <p>you came from Discord<br>you looked so young<br>you were artistic<br>03 May became the beginning<br>and now there is a whole operating system with your name hiding inside it.</p>
+      </div>
+      <div class="card vault" style="animation:fadeIn 0.6s ease; text-align:center; cursor:pointer;" onclick="showAppModal('Redeemed', 'Take a screenshot and send it to me. I owe you one favor, no questions asked. 🤍')">
+        <h3>REWARD TOKEN</h3>
+        <p>Tap here to claim your reward token. I cannot say no to it (1 time only).</p>
+      </div>`;
+    spawnSpark('💖');
+  } else {
+    showAppModal("Access Denied", "Wrong key. Think back to our beginning.");
+  }
+}
+
+/* BACKGROUND TOASTS */
+const incoming = [
+  "hey moon did you drink water yet",
+  "I was thinking about you again",
+  "you are still my favorite notification",
+  "come here I have a forehead kiss reserved for you",
+  "I hope your day is being gentle with you",
+  "random reminder: you are very very loved",
+  "I saw the moon and thought of you",
+  "you crossed my mind again. unsurprisingly"
+];
+const rareIncoming = [
+  "✨ okay this one is rare. you do not get this message often. I love you a stupid amount, Tasnimun.",
+  "✨ if you are seeing this, you got lucky. consider this your reminder that you are my favorite person on earth.",
+  "✨ rare drop unlocked: a fact. I have never once regretted a single day with you."
+];
+let toastTimer;
+function showToast(){
+  const isRare = Math.random() < 0.05;
+  const msg = isRare
+    ? rareIncoming[Math.floor(Math.random() * rareIncoming.length)]
+    : incoming[Math.floor(Math.random() * incoming.length)];
+    
+  if(!unlocked) {
+    // Pop up emoji only on lockscreen
+    showNotificationToast(msg);
+  } else {
+    document.getElementById('toastMsg').textContent = msg;
+    const t = document.getElementById('toast');
+    t.classList.toggle('rare-toast', isRare);
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), isRare ? 7000 : 5200);
+  }
+}
+function scheduleToast(){
+  const delay = 45000;
+  setTimeout(() => { showToast(); scheduleToast(); }, delay);
+}
+scheduleToast();
+
+/* KONAMI CODE */
+function triggerKonamiSecret(){
+  for (let i = 0; i < 24; i++) {
+    setTimeout(() => spawnSpark(['✨','💫','🌙','💗'][Math.floor(Math.random()*4)]), i * 60);
+  }
+  showAppModal("Secret Code Accepted 🕹️", "You found the hidden code. There is no prize, no unlock, nothing practical about this at all — I just wanted one corner of this app that only the most curious version of you would ever find.");
+}
+
+const konamiSequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiProgress = [];
+document.addEventListener('keydown', (e) => {
+  konamiProgress.push(e.key);
+  konamiProgress = konamiProgress.slice(-konamiSequence.length);
+  if (konamiProgress.length === konamiSequence.length &&
+      konamiProgress.every((k, i) => k.toLowerCase() === konamiSequence[i].toLowerCase())) {
+    konamiProgress = [];
+    triggerKonamiSecret();
+  }
+});
+
+const konamiSwipeSequence = ['up','up','down','down','left','right','left','right'];
+let konamiSwipeProgress = [];
+let swipeStartX = 0, swipeStartY = 0;
+document.addEventListener('touchstart', (e) => {
+  if (!e.touches || !e.touches[0]) return;
+  swipeStartX = e.touches[0].clientX;
+  swipeStartY = e.touches[0].clientY;
+}, { passive: true });
+document.addEventListener('touchend', (e) => {
+  if (!e.changedTouches || !e.changedTouches[0]) return;
+  const dx = e.changedTouches[0].clientX - swipeStartX;
+  const dy = e.changedTouches[0].clientY - swipeStartY;
+  const absX = Math.abs(dx), absY = Math.abs(dy);
+  const SWIPE_THRESHOLD = 35;
+  if (Math.max(absX, absY) < SWIPE_THRESHOLD) return;
+
+  let dir;
+  if (absX > absY) dir = dx > 0 ? 'right' : 'left';
+  else dir = dy > 0 ? 'down' : 'up';
+
+  konamiSwipeProgress.push(dir);
+  konamiSwipeProgress = konamiSwipeProgress.slice(-konamiSwipeSequence.length);
+  if (konamiSwipeProgress.length === konamiSwipeSequence.length &&
+      konamiSwipeProgress.every((d, i) => d === konamiSwipeSequence[i])) {
+    konamiSwipeProgress = [];
+    triggerKonamiSecret();
+  }
+}, { passive: true });
+
+/* ISLAND SECRET */
+let secretClicks = 0;
+function islandSecret(){
+  secretClicks++;
+  spawnSpark('✨');
+  if(secretClicks >= 3){
+    secretClicks = 0;
+    showAppModal("System Override", "03 taps.<br>03 May.<br>03 little seconds of courage.<br><br>That is your secret shortcut into the moon.");
+  }
+}
+
+/* SPARKLE EFFECT */
+function spawnSpark(char='✦'){
+  const s = document.createElement('div');
+  s.className = 'spark';
+  s.textContent = char;
+  s.style.left = (35 + Math.random() * 30) + '%';
+  s.style.top = (48 + Math.random() * 20) + '%';
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 1200);
+}
+
+/* ================= TIC TAC TOE ================= */
+let tttBoardState = Array(9).fill(null);
+let tttGameOver = false;
+let tttScoreData = JSON.parse(localStorage.getItem('moon_ttt_score') || '{"wins":0,"losses":0,"draws":0}');
+
+function tttUpdateScoreDisplay(){
+  document.getElementById('tttScore').textContent =
+    `wins: ${tttScoreData.wins} · losses: ${tttScoreData.losses} · draws: ${tttScoreData.draws}`;
+}
+
+const TTT_WIN_LINES = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+function tttCheckWinner(board){
+  for (const [a,b,c] of TTT_WIN_LINES){
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+  }
+  if (board.every(cell => cell)) return 'draw';
+  return null;
+}
+
+function tttRender(){
+  const boardEl = document.getElementById('tttBoard');
+  boardEl.innerHTML = '';
+  tttBoardState.forEach((cell, i) => {
+    const cellBtn = document.createElement('button');
+    cellBtn.className = 'close';
+    cellBtn.style.cssText = 'width:100%;aspect-ratio:1;font-size:28px;border-radius:14px;';
+    cellBtn.textContent = cell === 'X' ? '❌' : cell === 'O' ? '⭕' : '';
+    cellBtn.disabled = !!cell || tttGameOver;
+    cellBtn.onclick = () => tttPlayerMove(i);
+    boardEl.appendChild(cellBtn);
+  });
+}
+
+function tttPlayerMove(i){
+  if (tttBoardState[i] || tttGameOver) return;
+  tttBoardState[i] = 'X';
+  tttRender();
+  const result = tttCheckWinner(tttBoardState);
+  if (result){
+    tttEndGame(result);
+    return;
+  }
+  document.getElementById('tttStatus').textContent = "Alamin-san— thinking...";
+  setTimeout(tttComputerMove, 450);
+}
+
+function tttComputerMove(){
+  if (tttGameOver) return;
+  const empty = tttBoardState.map((c,i) => c ? null : i).filter(i => i !== null);
+  if (empty.length === 0) return;
+
+  let move;
+  if (Math.random() < 0.75){
+    move = tttBestMove(tttBoardState);
+  } else {
+    move = empty[Math.floor(Math.random() * empty.length)];
+  }
+  tttBoardState[move] = 'O';
+  tttRender();
+  const result = tttCheckWinner(tttBoardState);
+  if (result){
+    tttEndGame(result);
+  } else {
+    document.getElementById('tttStatus').textContent = 'your turn — you are ❌';
+  }
+}
+
+function tttBestMove(board){
+  let bestScore = -Infinity;
+  let move = null;
+  board.forEach((cell, i) => {
+    if (!cell){
+      board[i] = 'O';
+      const score = tttMinimax(board, 0, false);
+      board[i] = null;
+      if (score > bestScore){
+        bestScore = score;
+        move = i;
+      }
+    }
+  });
+  return move;
+}
+
+function tttMinimax(board, depth, isMaximizing){
+  const result = tttCheckWinner(board);
+  if (result === 'O') return 10 - depth;
+  if (result === 'X') return depth - 10;
+  if (result === 'draw') return 0;
+
+  if (isMaximizing){
+    let best = -Infinity;
+    board.forEach((cell, i) => {
+      if (!cell){
+        board[i] = 'O';
+        best = Math.max(best, tttMinimax(board, depth+1, false));
+        board[i] = null;
+      }
+    });
+    return best;
+  } else {
+    let best = Infinity;
+    board.forEach((cell, i) => {
+      if (!cell){
+        board[i] = 'X';
+        best = Math.min(best, tttMinimax(board, depth+1, true));
+        board[i] = null;
+      }
+    });
+    return best;
+  }
+}
+
+function tttEndGame(result){
+  tttGameOver = true;
+  tttRender();
+  if (result === 'X'){
+    tttScoreData.wins++;
+    document.getElementById('tttStatus').textContent = 'you won! 🎉';
+  } else if (result === 'O'){
+    tttScoreData.losses++;
+    document.getElementById('tttStatus').textContent = 'Alamin-san wins this one 🌙';
+  } else {
+    tttScoreData.draws++;
+    document.getElementById('tttStatus').textContent = "it's a draw";
+  }
+  localStorage.setItem('moon_ttt_score', JSON.stringify(tttScoreData));
+  tttUpdateScoreDisplay();
+}
+
+function tttReset(){
+  tttBoardState = Array(9).fill(null);
+  tttGameOver = false;
+  document.getElementById('tttStatus').textContent = 'your turn — you are ❌';
+  tttRender();
+}
+tttUpdateScoreDisplay();
+tttRender();
+
+/* ================= SNAKE ================= */
+const SNAKE_GRID = 13;
+let snakeCanvas, snakeCtx, snakeCellSize;
+let snakeBody = [];
+let snakeDir = 'right';
+let snakeNextDir = 'right';
+let snakeFood = { x: 8, y: 8 };
+let snakeRunning = false;
+let snakeLoopTimer = null;
+let snakeScoreVal = 0;
+let snakeBest = parseInt(localStorage.getItem('moon_snake_best') || '0', 10);
+
+function snakeInitCanvas(){
+  snakeCanvas = document.getElementById('snakeCanvas');
+  snakeCtx = snakeCanvas.getContext('2d');
+  snakeCellSize = snakeCanvas.width / SNAKE_GRID;
+}
+
+function snakeRandomFood(){
+  let pos;
+  do {
+    pos = { x: Math.floor(Math.random()*SNAKE_GRID), y: Math.floor(Math.random()*SNAKE_GRID) };
+  } while (snakeBody.some(seg => seg.x === pos.x && seg.y === pos.y));
+  return pos;
+}
+
+function snakeStart(){
+  if (!snakeCanvas) snakeInitCanvas();
+  snakeBody = [{x:6,y:6},{x:5,y:6},{x:4,y:6}];
+  snakeDir = 'right';
+  snakeNextDir = 'right';
+  snakeScoreVal = 0;
+  snakeFood = snakeRandomFood();
+  snakeRunning = true;
+  document.getElementById('snakeStatus').textContent = 'swipe or use the arrows — eat the 🌙';
+  snakeUpdateScoreDisplay();
+  clearInterval(snakeLoopTimer);
+  snakeLoopTimer = setInterval(snakeTick, 160);
+  snakeDraw();
+}
+
+function snakeUpdateScoreDisplay(){
+  document.getElementById('snakeScore').textContent = `score: ${snakeScoreVal} · best: ${snakeBest}`;
+}
+
+function snakeSetDir(dir){
+  const opposite = { up:'down', down:'up', left:'right', right:'left' };
+  if (opposite[dir] === snakeDir) return;
+  snakeNextDir = dir;
+}
+
+function snakeTick(){
+  if (!snakeRunning) return;
+  snakeDir = snakeNextDir;
+  const head = { ...snakeBody[0] };
+  if (snakeDir === 'up') head.y--;
+  if (snakeDir === 'down') head.y++;
+  if (snakeDir === 'left') head.x--;
+  if (snakeDir === 'right') head.x++;
+
+  if (head.x < 0 || head.x >= SNAKE_GRID || head.y < 0 || head.y >= SNAKE_GRID){
+    return snakeGameOver();
+  }
+  if (snakeBody.some(seg => seg.x === head.x && seg.y === head.y)){
+    return snakeGameOver();
+  }
+
+  snakeBody.unshift(head);
+  if (head.x === snakeFood.x && head.y === snakeFood.y){
+    snakeScoreVal++;
+    snakeUpdateScoreDisplay();
+    snakeFood = snakeRandomFood();
+  } else {
+    snakeBody.pop();
+  }
+  snakeDraw();
+}
+
+function snakeGameOver(){
+  snakeRunning = false;
+  clearInterval(snakeLoopTimer);
+  if (snakeScoreVal > snakeBest){
+    snakeBest = snakeScoreVal;
+    localStorage.setItem('moon_snake_best', snakeBest);
+  }
+  snakeUpdateScoreDisplay();
+  document.getElementById('snakeStatus').textContent = `game over — score ${snakeScoreVal}. tap New Game to retry`;
+}
+
+function snakeDraw(){
+  if (!snakeCtx) return;
+  snakeCtx.clearRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+  snakeCtx.font = `${snakeCellSize*0.9}px serif`;
+  snakeCtx.textAlign = 'center';
+  snakeCtx.textBaseline = 'middle';
+  snakeCtx.fillText('🌙', snakeFood.x*snakeCellSize + snakeCellSize/2, snakeFood.y*snakeCellSize + snakeCellSize/2);
+
+  snakeBody.forEach((seg, i) => {
+    snakeCtx.fillStyle = i === 0 ? 'rgba(255,185,221,0.95)' : 'rgba(217,194,255,0.85)';
+    const pad = 2;
+    snakeCtx.beginPath();
+    snakeCtx.roundRect(seg.x*snakeCellSize+pad, seg.y*snakeCellSize+pad, snakeCellSize-pad*2, snakeCellSize-pad*2, 5);
+    snakeCtx.fill();
+  });
+}
+
+let snakeTouchStartX = 0, snakeTouchStartY = 0;
+document.addEventListener('DOMContentLoaded', () => {
+  const canvasEl = document.getElementById('snakeCanvas');
+  if (!canvasEl) return;
+  canvasEl.addEventListener('touchstart', (e) => {
+    if (!e.touches[0]) return;
+    snakeTouchStartX = e.touches[0].clientX;
+    snakeTouchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  canvasEl.addEventListener('touchend', (e) => {
+    if (!e.changedTouches[0]) return;
+    const dx = e.changedTouches[0].clientX - snakeTouchStartX;
+    const dy = e.changedTouches[0].clientY - snakeTouchStartY;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return;
+    if (Math.abs(dx) > Math.abs(dy)) snakeSetDir(dx > 0 ? 'right' : 'left');
+    else snakeSetDir(dy > 0 ? 'down' : 'up');
+  }, { passive: true });
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('snake').classList.contains('active')) return;
+  if (e.key === 'ArrowUp') snakeSetDir('up');
+  if (e.key === 'ArrowDown') snakeSetDir('down');
+  if (e.key === 'ArrowLeft') snakeSetDir('left');
+  if (e.key === 'ArrowRight') snakeSetDir('right');
+});
+snakeUpdateScoreDisplay();
+
+/* ================= MOOD TRACKER ================= */
+const MOOD_NOTES = {
+  Happy: "That smile of yours is honestly one of my favorite things in the world. Keep that light going, my moon — it looks so good on you.",
+  Tired: "Then rest, love. Really rest, not just lie down while your mind keeps running. I've got you. Close your eyes for a bit — the world can wait.",
+  MissingYou: "I know. I feel it too, more than I probably say. The distance is temporary, but how much I care about you is not going anywhere.",
+  Stressed: "Breathe with me for a second. In... and out. Whatever it is, you don't have to carry it alone — tell me, and let's figure it out together.",
+  Loved: "Good. Because you are. Endlessly, obviously, completely loved — today, and every ordinary day after this one too.",
+  Quiet: "Some of my favorite versions of you are the quiet ones. No need to perform anything right now — just be still, I'm right here with you.",
+  Angry: "Okay, I hear you. You're allowed to be angry, I'm not going to tell you to calm down. Vent it all at me if you need to — I can take it, and I'm not going anywhere."
+};
+const MOOD_LOG_KEY = 'moon_last_mood';
+
+function logMood(key, emoji, label){
+  localStorage.setItem(MOOD_LOG_KEY, JSON.stringify({ label, emoji, at: Date.now() }));
+  renderLastMood();
+  showAppModal(`${emoji} ${label}`, MOOD_NOTES[key] || "Thank you for sharing how you feel with me.");
+  sendDiscordLifecycle(`💗 Tasnimun logged her mood: ${emoji} ${label}`);
+}
+
+function renderLastMood(){
+  const el = document.getElementById('moodLastLogged');
+  if (!el) return;
+  const saved = localStorage.getItem(MOOD_LOG_KEY);
+  if (!saved) { el.textContent = 'Last mood logged: none yet'; return; }
+  try {
+    const { label, emoji } = JSON.parse(saved);
+    el.textContent = `Last mood logged: ${label} ${emoji}`;
+  } catch (_) {
+    el.textContent = 'Last mood logged: none yet';
+  }
+}
+renderLastMood();
+  // Start transparent consent-based location/lifecycle handling after the UI is ready.
+  initLocationTracking();
+</script>
+</body>
+</html>
